@@ -1,5 +1,19 @@
 # LampCode Changelog
 
+## Version 1.2.0 - Context Refresh & UI Tweaks
+
+### Highlights
+
+- 🔄 **Smarter Context Management** – Added incremental refresh helpers, change logging, and normalized project paths so tool edits reflect immediately without full rescans.
+- 🛠️ **Tool Enhancements** – `edit_file` and `create_file` now refresh single-file context snapshots and report updated metadata.
+- 🧹 **Cleaner CLI Output** – Default verbosity switched to "minimal" for compact tool call summaries, keeping the terminal readable.
+- 🗂️ **Directory Tracking** – Cached directory indexes invalidate automatically when new files appear, reducing stale listings.
+
+### Other Improvements
+
+- Added recent change history accessor for potential future diagnostics.
+- Normalized paths returned by the file scanner to ensure consistent casing and separators across platforms.
+
 ## Version 1.1.0 - Edit & Search Features
 
 ### New Features

@@ -20,7 +20,7 @@ if (!fs.existsSync(mainModulePath)) {
 program
   .name('lamp')
   .description('A CLI coding assistant powered by OpenRouter API')
-  .version('1.1.0');
+  .version('1.2.0');
 
 // Default command - start interactive chat
 program

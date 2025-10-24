@@ -7,7 +7,8 @@ A powerful CLI coding assistant powered by OpenRouter API. Get AI help with your
 - **Interactive Chat**: Natural language coding assistance
 - **Project Analysis**: Understands your current project structure
 - **File Operations**: Read, analyze, and help modify your code files
-- **Autonomous Tooling**: AI can invoke built-in tools to read, search, or create files on your behalf
+- **Autonomous Tooling**: AI can invoke built-in tools to read, search, apply precise edits, or create files on your behalf
+- **Guided CLI Experience**: Structured dividers and detailed tool summaries keep every interaction easy to follow
 - **Multiple AI Models**: Support for Claude, GPT, and other OpenRouter models
 - **Context Aware**: Provides relevant suggestions based on your project
 
