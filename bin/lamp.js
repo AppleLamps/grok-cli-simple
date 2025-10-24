@@ -30,7 +30,11 @@ program
       const lampCode = new LampCode();
       await lampCode.startChat();
     } catch (error) {
-      console.error('Error starting LampCode:', error.message);
+      console.error('\n❌ Error starting LampCode:', error.message);
+      console.error('\n💡 If the issue persists, check:');
+      console.error('   - Your .env file exists and has OPENROUTER_API_KEY set');
+      console.error('   - You have an internet connection');
+      console.error('   - Run with: npm link (for local testing)\n');
       process.exit(1);
     }
   });

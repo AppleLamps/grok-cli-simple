@@ -14,8 +14,9 @@
 - **Architecture:** Modular command pattern with utility separation
 - **Primary Function:** AI-powered coding assistance via CLI
 - **API:** OpenRouter (supports multiple LLM providers)
+- **POWERSHELL** I am always on Windows, use POWERSHELL commands to create folders, files, etc.
 
-**Version:** 1.1.0
+**Version:** 1.2.4
 
 ---
 
@@ -65,6 +66,7 @@ lampcode/
 │   └── utils/                  # Shared utilities
 │       ├── apiClient.js        # OpenRouter API communication
 │       ├── fileScanner.js      # Project file scanning
+│       ├── ui.js               # Terminal UI with colors (chalk)
 │       └── prompt.js           # Readline prompt helpers
 │
 ├── docs/                       # Documentation
@@ -153,6 +155,8 @@ Located at `lib/tools/index.js`. Each tool exposes a structured async handler th
 - `read_file` – reads files with optional line slicing and truncation safeguards
 - `search_code` – performs text search with capped results
 - `create_file` – creates or overwrites files (optionally refreshing context)
+- `edit_file` – modifies existing files with find/replace operations
+- `list_directory` – lists directory contents and structure
 
 `LampCode.processMessage()` parses JSON responses from the model. When the model requests `{ "type": "tool_call", ... }`, the orchestrator executes the corresponding handler, logs the action to the terminal (tool name, args, errors, context refresh counts), appends the result as a `tool` message, and re-queries the model until a final reply is produced or the iteration cap (default 5) is reached.
 
@@ -274,6 +278,7 @@ class ClassName {
 ```json
 {
   "axios": "^1.6.0",        // HTTP client for API requests
+  "chalk": "^4.1.2",        // Terminal colors and styling
   "commander": "^11.1.0",   // CLI framework
   "dotenv": "^16.3.1",      // Environment variable management
   "open": "^9.1.0"          // Cross-platform file opening
@@ -288,7 +293,7 @@ class ClassName {
 }
 ```
 
-**Note:** Previously used `chalk`, `inquirer`, and `ora` but removed for simplicity. Use native `console.log()` and `readline` instead.
+**Note:** Uses `chalk` v4.1.2 for terminal styling (last version supporting CommonJS). The UI utility class (`lib/utils/ui.js`) provides styled output methods.
 
 ---
 
@@ -303,10 +308,17 @@ OPENROUTER_MODEL=x-ai/grok-code-fast-1  # Optional: Default model
 
 **Available Models:**
 
-- `x-ai/grok-code-fast-1` - Fast responses
-- `anthropic/claude-3.5-sonnet` - High quality
+- `x-ai/grok-code-fast-1` - **Recommended default** - Optimized for agentic tasks, 4x faster, 1/10th cost
+- `anthropic/claude-3.5-sonnet` - High quality reasoning
 - `openai/gpt-4` - Most capable
 - `openai/gpt-3.5-turbo` - Cost effective
+
+**Grok Code Fast 1 Optimization Tips:**
+
+- Uses XML-structured system prompts for clarity
+- Native JSON tool calling (not XML-based)
+- Optimized for rapid iteration and agentic workflows
+- See `grok-code-fast-1-tips.md` for detailed prompting strategies
 
 ---
 
@@ -655,6 +667,6 @@ When contributing to this codebase, ensure:
 
 ---
 
-**Last Updated:** 2025-10-23 | **Version:** 1.1.0
+**Last Updated:** 2025-10-24 | **Version:** 1.2.4
 
 For questions or clarifications, refer to `docs/ARCHITECTURE.md` or examine existing command implementations in `lib/commands/`.

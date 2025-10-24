@@ -5,12 +5,14 @@ A powerful CLI coding assistant powered by OpenRouter API. Get AI help with your
 ## ✨ Features
 
 - **Interactive Chat**: Natural language coding assistance
+- **Beautiful UI**: Colorful terminal interface with styled boxes and clear formatting
 - **Project Analysis**: Understands your current project structure
-- **File Operations**: Read, analyze, and help modify your code files
-- **Autonomous Tooling**: AI can invoke built-in tools to read, search, apply precise edits, or create files on your behalf
-- **Guided CLI Experience**: Structured dividers and detailed tool summaries keep every interaction easy to follow
-- **Multiple AI Models**: Support for Claude, GPT, and other OpenRouter models
+- **File Operations**: Read, analyze, and modify your code files
+- **Autonomous Tooling**: AI automatically invokes tools to read, search, edit, or create files
+- **Multiple AI Models**: Support for Grok, Claude, GPT, and other OpenRouter models
+- **Optimized for Grok**: XML-structured prompts and native JSON tool calling
 - **Context Aware**: Provides relevant suggestions based on your project
+- **Real-time Tool Logging**: Watch the AI work with colored tool call indicators
 
 ## 🛠️ Installation
 
@@ -38,7 +40,7 @@ npm install
 
    ```env
    OPENROUTER_API_KEY=your_api_key_here
-   OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
+   OPENROUTER_MODEL=x-ai/grok-code-fast-1
    ```
 
 ### 3. Make it globally available
@@ -73,14 +75,20 @@ lamp
 
 ### Available Commands
 
-- `help` - Show available commands
+- `help` - Show available commands with styled formatting
 - `clear` - Clear the terminal screen
 - `read <filename>` - Read and analyze a specific file
 - `edit <filename>` - Edit a file with AI suggestions
 - `search <query>` - Search codebase for specific text
 - `open <filename>` - Open a file in your default editor
+- `history` - View recent tool usage history
 - `exit` or `quit` - Exit LampCode
-- AI chats can also autonomously trigger internal tools (like reading files, searching code, or creating new files) when additional context is needed.
+
+**Natural Language:** Just chat! The AI will automatically use tools when needed:
+
+- "Create a React component" → AI uses `create_file`
+- "Search for axios usage" → AI uses `search_code`
+- "Update package.json version" → AI uses `edit_file`
 
 ### Example Interactions
 
@@ -109,7 +117,10 @@ lamp> Create a todo list component with React hooks
 You can change the AI model in your `.env` file:
 
 ```env
-# Claude models (recommended)
+# Grok (recommended - optimized for agentic tasks)
+OPENROUTER_MODEL=x-ai/grok-code-fast-1
+
+# Claude models
 OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
 OPENROUTER_MODEL=anthropic/claude-3-opus
 OPENROUTER_MODEL=anthropic/claude-3-haiku
@@ -117,9 +128,14 @@ OPENROUTER_MODEL=anthropic/claude-3-haiku
 # OpenAI models
 OPENROUTER_MODEL=openai/gpt-4
 OPENROUTER_MODEL=openai/gpt-3.5-turbo
-
-# Other models available on OpenRouter
 ```
+
+**Why Grok Code Fast 1?**
+
+- 4x faster than other models
+- 1/10th the cost
+- Optimized for tool calling and code tasks
+- Native JSON support
 
 ### Project Context
 
@@ -170,5 +186,6 @@ This project is licensed under the MIT License.
 ## 🙏 Acknowledgments
 
 - Built with OpenRouter API
+- Optimized for x.ai's Grok Code Fast 1
 - Inspired by modern CLI coding assistants
-- Thanks to the open source community for amazing tools like Commander.js and Inquirer.js
+- Thanks to the open source community for amazing tools like Commander.js and Chalk
