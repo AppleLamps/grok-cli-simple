@@ -4,6 +4,7 @@ const { Command } = require('commander');
 const path = require('path');
 const fs = require('fs');
 const { LampCode } = require('../lib/lampcode');
+const packageJson = require('../package.json');
 
 const program = new Command();
 
@@ -20,7 +21,7 @@ if (!fs.existsSync(mainModulePath)) {
 program
   .name('lamp')
   .description('A CLI coding assistant powered by OpenRouter API')
-  .version('1.2.3');
+  .version(packageJson.version);
 
 // Default command - start interactive chat
 program
