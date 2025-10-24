@@ -1,0 +1,35 @@
+{
+  "name": "lampcode",
+  "version": "1.1.0",
+  "description": "A CLI coding assistant powered by OpenRouter API",
+  "main": "index.js",
+  "bin": {
+    "lamp": "./bin/lamp.js"
+  },
+  "scripts": {
+    "start": "node bin/lamp.js",
+    "dev": "node bin/lamp.js",
+    "build": "echo 'No build step required'"
+  },
+  "keywords": [
+    "cli",
+    "coding",
+    "assistant",
+    "ai",
+    "openrouter"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "commander": "^11.1.0",
+    "dotenv": "^16.3.1",
+    "open": "^9.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
