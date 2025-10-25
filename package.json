@@ -1,7 +1,7 @@
 {
   "name": "lampcode",
-  "version": "1.2.4",
-  "description": "A CLI coding assistant powered by OpenRouter API",
+  "version": "1.3.0",
+  "description": "A CLI coding assistant powered by OpenRouter API with prompt caching",
   "main": "lib/lampcode.js",
   "bin": {
     "lamp": "./bin/lamp.js"
@@ -10,7 +10,9 @@
     "start": "node bin/lamp.js",
     "dev": "node bin/lamp.js",
     "build": "echo 'No build step required'",
-    "test": "node scripts/test-tools-registry.js"
+    "test": "node scripts/test-tools-registry.js",
+    "test:caching": "node scripts/test-prompt-caching.js",
+    "test:all": "npm test && npm run test:caching"
   },
   "keywords": [
     "cli",

@@ -1,5 +1,50 @@
 # LampCode Features Guide
 
+## 💰 Prompt Caching (v1.3.0+)
+
+LampCode now includes intelligent prompt caching to reduce costs and improve response times.
+
+### What Is Prompt Caching?
+
+Prompt caching allows frequently-used content (like system prompts and project context) to be reused across multiple API calls, significantly reducing input token costs.
+
+### Automatic Caching Models
+
+These models cache automatically without any configuration:
+
+- **Grok (x-ai/grok-code-fast-1)** - Default model, 256K context
+- **OpenAI (GPT-4, GPT-3.5)** - Caches prompts > 1024 tokens
+- **DeepSeek** - Automatic caching enabled
+
+### Manual Caching Models
+
+LampCode automatically adds `cache_control` for these models:
+
+- **Anthropic Claude** - 90% savings on cache reads
+- **Google Gemini** - 75% savings on cache reads
+
+### Cost Savings
+
+- **Grok**: Reduced cost on cache reads, no write fees
+- **Claude**: 90% savings on repeated content
+- **OpenAI**: 50-75% savings on cache reads
+
+### How It Works
+
+1. **First request**: System prompt and context are cached
+2. **Subsequent requests**: Reuse cached content, only pay for new messages
+3. **Smart routing**: OpenRouter routes to same provider for cache hits
+
+### Best Practices
+
+- Keep conversations going (caches expire after ~5 minutes)
+- Large codebases benefit most
+- Continue sessions instead of restarting
+
+See [PROMPT-CACHING.md](./PROMPT-CACHING.md) for detailed information.
+
+---
+
 ## 🔍 Search Command
 
 The search command helps you find text across your entire codebase quickly.

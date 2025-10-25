@@ -491,32 +491,67 @@ LampCode includes sophisticated token tracking and optimization:
 - **Safety Margins:** Reserves buffer tokens to prevent API rejections
 
 **Model Configurations** (in `lampcode.js`):
+
 ```javascript
 const MODEL_CONFIGS = {
-  'x-ai/grok-code-fast-1': { maxInputTokens: 8000, safetyMargin: 1000 },
-  'anthropic/claude-3.5-sonnet': { maxInputTokens: 180000, safetyMargin: 5000 },
-  'openai/gpt-4': { maxInputTokens: 120000, safetyMargin: 4000 },
-  'openai/gpt-3.5-turbo': { maxInputTokens: 15000, safetyMargin: 2000 }
+  'x-ai/grok-code-fast-1': {
+    maxInputTokens: 256000, // Updated to full 256K context
+    safetyMargin: 5000,
+    supportsPromptCaching: true,
+    autoCaching: true // Automatic caching
+  },
+  'anthropic/claude-3.5-sonnet': {
+    maxInputTokens: 180000,
+    safetyMargin: 5000,
+    supportsPromptCaching: true,
+    autoCaching: false, // Requires manual cache_control
+    cacheBreakpoints: 4
+  },
+  'openai/gpt-4': {
+    maxInputTokens: 120000,
+    safetyMargin: 4000,
+    supportsPromptCaching: true,
+    autoCaching: true // Automatic for prompts > 1024 tokens
+  },
+  'openai/gpt-3.5-turbo': {
+    maxInputTokens: 15000,
+    safetyMargin: 2000,
+    supportsPromptCaching: false
+  }
 };
 ```
 
 ### Advanced Features
 
+**Prompt Caching (NEW):**
+
+- **Automatic Caching**: Grok, OpenAI, and DeepSeek models automatically cache prompts
+- **Manual Caching**: Anthropic Claude and Google Gemini use `cache_control` breakpoints
+- **System Prompt Caching**: Large system prompts are cached to reduce costs
+- **Context Caching**: Project file context is cached separately for optimal reuse
+- **Cost Savings**: Up to 50-80% reduction in input token costs for repeated conversations
+- **Latency Improvement**: Cached prompts process faster
+- **Smart Routing**: OpenRouter routes to same provider to maximize cache hits
+
 **Directory Indexing & Caching:**
+
 - Pre-loads directory structures for fast file lookups
 - Maintains `projectFileIndex` and `projectBaseNameIndex` maps
 - Caches directory entries to avoid repeated filesystem scans
 
 **Tool History Tracking:**
+
 - Records every tool call with timestamp, duration, status
 - Accessible via `history` command
 - Includes detailed summaries and error messages
 
 **Change Logging:**
+
 - Tracks all file modifications during session
 - Useful for debugging and understanding AI actions
 
 **Context Snippets:**
+
 - Generates smart code snippets from project files
 - Caches snippets to reduce redundant processing
 - Limits snippet size to stay within token budgets

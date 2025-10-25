@@ -159,6 +159,8 @@ OPENROUTER_MODEL=openai/gpt-3.5-turbo
 
 **Why Grok Code Fast 1?**
 
+- **256K context window** - Handle large codebases with ease
+- **Automatic prompt caching** - Reduces costs and improves latency
 - 4x faster than other models
 - 1/10th the cost
 - Optimized for tool calling and code tasks
@@ -178,48 +180,99 @@ LampCode automatically analyzes your project files to provide context-aware assi
 The AI can automatically invoke these tools to complete tasks:
 
 #### 1. `list_context`
+
 **View cached project files**
+
 - Shows currently loaded files with sizes and previews
 - No parameters needed
 - Example: "What files are currently loaded?"
 
 #### 2. `refresh_context`
+
 **Rescan workspace**
+
 - Parameters: `limit` (max files, default 20), `include_metadata`, `include_hidden`
 - Updates project context with fresh file data
 - Example: "Refresh the project context to see my new files"
 
 #### 3. `read_file`
+
 **Read file content**
+
 - Parameters: `file_path` (required), `start_line`, `end_line`, `max_lines`
 - Supports reading specific line ranges for large files
 - Example: "Read the authentication middleware"
 
 #### 4. `search_code`
+
 **Search across files**
+
 - Parameters: `query` (required), `file_pattern`, `max_results`
 - Returns matching lines with file paths and line numbers
 - Example: "Find all uses of the getUserData function"
 
 #### 5. `create_file`
+
 **Create new files**
+
 - Parameters: `file_path` (required), `content` (required), `overwrite`, `refresh_context`
 - Creates files within workspace boundaries
 - Example: "Create a new React component for the user profile"
 
 #### 6. `edit_file`
+
 **Modify existing files**
+
 - Parameters: `file_path` (required), `edits` (array of find/replace operations)
 - Supports multiple edits in a single operation
 - Example: "Update the API endpoint URL in the config file"
 
 #### 7. `list_directory`
+
 **Explore directory structure**
+
 - Parameters: `directory_path`, `recursive`, `max_depth`, `include_hidden`
 - Lists files and subdirectories
 - Example: "Show me what's in the components folder"
 
 **Security:** All file operations validate paths to prevent access outside the workspace. Symlinks and directory traversal attempts are blocked.
+
+## 💰 Prompt Caching
+
+LampCode now supports **prompt caching** to reduce costs and improve response times:
+
+### Automatic Caching (No Configuration Needed)
+
+These models automatically cache your prompts:
+
+- **Grok** (x-ai/grok-code-fast-1) - Default model, automatic caching
+- **OpenAI** (GPT-4, GPT-3.5) - Caches prompts > 1024 tokens
+- **DeepSeek** - Automatic caching enabled
+
+### Manual Caching (Advanced)
+
+For Anthropic Claude and Google Gemini models, LampCode automatically adds `cache_control` breakpoints to:
+
+- System prompts (your AI instructions)
+- Project context (file contents)
+
+**Cost Savings:**
+
+- Grok: Cache reads at reduced cost, no cache write fees
+- Claude: Cache reads at 0.1x cost (90% savings on repeated content)
+- OpenAI: Cache reads at 0.25x-0.5x cost (50-75% savings)
+
+**How It Works:**
+
+1. First request: System prompt and context are cached
+2. Subsequent requests: Reuse cached content, only pay for new user messages
+3. OpenRouter routes to the same provider to maximize cache hits
+
+**Best Practices:**
+
+- Keep conversations going to benefit from caching
+- Large codebases benefit most from caching
+- System prompts and project context are automatically optimized for caching
 
 ## 📝 Requirements
 

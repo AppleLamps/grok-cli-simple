@@ -1,5 +1,42 @@
 # LampCode Changelog
 
+## Version 1.3.0 - Prompt Caching & Expanded Context
+
+### Highlights
+
+- 💰 **Prompt Caching Support** – Automatic caching for Grok, OpenAI, and DeepSeek models; manual `cache_control` for Anthropic Claude and Google Gemini
+- 🚀 **256K Context for Grok** – Increased Grok Code Fast 1 token limit from 8K to 256K (full context window)
+- 📉 **Cost Reduction** – Up to 50-80% savings on input tokens for repeated conversations
+- ⚡ **Faster Responses** – Cached prompts process faster, reducing latency
+- 🎯 **Smart Cache Management** – System prompts and project context automatically optimized for caching
+
+### Technical Details
+
+- Added model-specific caching configurations to `MODEL_CONFIGS`
+- Implemented `requiresManualCaching()` and `supportsPromptCaching()` helper methods
+- Updated `buildBaseMessages()` to format messages with `cache_control` breakpoints for Anthropic/Gemini
+- System prompts and project context are now cached separately for optimal reuse
+- OpenRouter automatically routes to the same provider to maximize cache hits
+
+### Model Support
+
+**Automatic Caching (No Configuration):**
+
+- Grok (x-ai/grok-code-fast-1) - Default model
+- OpenAI (GPT-4, GPT-3.5) - Prompts > 1024 tokens
+- DeepSeek
+
+**Manual Caching (Automatic `cache_control` Insertion):**
+
+- Anthropic Claude (3.5 Sonnet, Opus, Haiku)
+- Google Gemini (2.5 Pro, 2.5 Flash)
+
+### Documentation Updates
+
+- Added prompt caching section to README.md
+- Updated AGENTS.md with caching details and new model configurations
+- Documented cost savings and best practices
+
 ## Version 1.2.0 - Context Refresh & UI Tweaks
 
 ### Highlights
