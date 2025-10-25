@@ -49,8 +49,9 @@ lampcode/
 │   └── lamp.js                 # CLI entry point (Commander.js)
 │
 ├── lib/
-│   ├── lampcode.js             # Main orchestrator class (213 lines)
-│   │                           # Responsibilities: initialization, routing, AI chat
+│   ├── lampcode.js             # Main orchestrator class (1303 lines)
+│   │                           # Responsibilities: initialization, routing, AI chat,
+│   │                           # tool execution, token management, context caching
 │   │
 │   ├── commands/               # Command modules (one file per command)
 │   │   ├── index.js            # Exports all commands
@@ -58,16 +59,30 @@ lampcode/
 │   │   ├── read.js             # Read and analyze files
 │   │   ├── edit.js             # AI-assisted file editing
 │   │   ├── search.js           # Search codebase
-│   │   └── open.js             # Open files in editor
+│   │   ├── open.js             # Open files in editor
+│   │   └── history.js          # View tool call history
 │   │
-│   ├── tools/                  # Autonomous tool registry
-│   │   └── index.js            # Structured tool handlers (read/search/create/etc.)
+│   ├── tools/                  # Autonomous tool registry and implementations
+│   │   ├── index.js            # Main tool registry and exports
+│   │   ├── read-file.js        # Read file content with line ranges
+│   │   ├── edit-file.js        # Find/replace file modifications
+│   │   ├── create-file.js      # Create new files with content
+│   │   ├── search-code.js      # Search across project files
+│   │   ├── list-directory.js   # List directory contents and structure
+│   │   └── schemas.js          # Tool schemas for native calling
 │   │
 │   └── utils/                  # Shared utilities
 │       ├── apiClient.js        # OpenRouter API communication
-│       ├── fileScanner.js      # Project file scanning
+│       ├── fileScanner.js      # Project file scanning with caching
 │       ├── ui.js               # Terminal UI with colors (chalk)
-│       └── prompt.js           # Readline prompt helpers
+│       ├── uiHelpers.js        # UI formatting utilities
+│       ├── prompt.js           # Readline prompt helpers
+│       ├── pathSecurity.js     # Path validation and security
+│       ├── tool-helpers.js     # Shared tool utility functions
+│       └── tokenEstimator.js   # Token counting and estimation
+│
+├── scripts/                    # Testing and utility scripts
+│   └── test-tools-registry.js  # Tool registry validation
 │
 ├── docs/                       # Documentation
 │   ├── ARCHITECTURE.md         # Detailed architecture guide
@@ -75,7 +90,8 @@ lampcode/
 │   ├── EXAMPLES.md             # Usage examples
 │   ├── FEATURES.md             # Feature documentation
 │   ├── QUICK-START.md          # Getting started guide
-│   └── USAGE.md                # User manual
+│   ├── USAGE.md                # User manual
+│   └── REFACTOR-SUMMARY.md     # Refactoring documentation
 │
 ├── package.json                # NPM configuration & dependencies
 ├── README.md                   # Main documentation
@@ -203,6 +219,7 @@ module.exports = {
   edit: require('./edit'),
   search: require('./search'),
   open: require('./open'),
+  history: require('./history'),
   analyze: analyzeCommand  // Add new command
 };
 ```
@@ -216,16 +233,68 @@ if (trimmedInput.startsWith('analyze ')) {
   this.rl.prompt();
   return;
 }
+
+// Example: History command is routed as:
+if (trimmedInput === 'history') {
+  await commands.history(input.trim(), this.getContext());
+  this.rl.prompt();
+  return;
+}
 ```
 
 ### Step 4: Update Help
 
 ```javascript
-// lib/commands/help.js
+// lib/commands/help.js - Update UI commandList method
 console.log('  analyze <file>    Perform code analysis');
 ```
 
 **That's it!** No changes to existing code required.
+
+---
+
+## Tool Registry Deep Dive
+
+### Available Tools
+
+LampCode provides 7 built-in tools that the AI can invoke autonomously:
+
+1. **`list_context`** - View currently cached project files
+   - Returns file paths, sizes, and content previews
+   - No arguments required
+
+2. **`refresh_context`** - Rescan workspace and update cache
+   - Args: `limit` (max files, default 20), `include_metadata`, `include_hidden`
+   - Updates project context with fresh file data
+
+3. **`read_file`** - Read file content with optional line ranges
+   - Args: `file_path` (required), `start_line`, `end_line`, `max_lines`
+   - Supports line slicing and truncation safeguards
+
+4. **`search_code`** - Search for text patterns across files
+   - Args: `query` (required), `file_pattern`, `max_results`
+   - Returns matching lines with file paths and line numbers
+
+5. **`create_file`** - Create new files with content
+   - Args: `file_path` (required), `content` (required), `overwrite`, `refresh_context`
+   - Security: Validates paths stay within workspace
+
+6. **`edit_file`** - Modify files with find/replace operations
+   - Args: `file_path` (required), `edits` (array of {find, replace, limit})
+   - Supports multiple edits in a single call
+
+7. **`list_directory`** - Explore directory structure
+   - Args: `directory_path`, `recursive`, `max_depth`, `include_hidden`
+   - Returns file and directory listings
+
+### Tool Security
+
+All file operations enforce security through `pathSecurity.js`:
+
+- **Workspace Boundaries**: Tools cannot access files outside the working directory
+- **Path Traversal Protection**: Blocks `../` and absolute paths attempting to escape
+- **Symlink Protection**: Prevents following symlinks that lead outside workspace
+- **Validation**: Uses `path.relative()` to prevent prefix attacks
 
 ---
 
@@ -409,6 +478,48 @@ npm install -g lampcode
 - **Supported Extensions:** `.js`, `.ts`, `.jsx`, `.tsx`, `.py`, `.java`, `.cpp`, `.c`, `.go`, `.rs`, `.php`, `.rb`, `.swift`, `.kt`, `.scala`, `.html`, `.css`, `.json`, `.md`, `.txt`
 - **Autonomous tools:** `create_file` keeps writes inside the workspace, supports `overwrite` toggles, and can trigger a fresh project scan when called with `refresh_context: true`
 - **Logging:** Every tool invocation is printed in the CLI so users can audit automatic actions, including refresh summaries and iteration limits
+- **Security:** All paths validated through `pathSecurity.js` to prevent directory traversal and symlink attacks
+
+### Token Management
+
+LampCode includes sophisticated token tracking and optimization:
+
+- **Model-Specific Limits:** Configures max tokens per model (Grok: 8K, Claude: 180K, GPT-4: 120K)
+- **Automatic History Trimming:** Keeps conversation history under 8,000 tokens
+- **Context Optimization:** Caches file content and generates smart snippets
+- **Token Estimation:** Uses `tokenEstimator.js` for accurate token counting
+- **Safety Margins:** Reserves buffer tokens to prevent API rejections
+
+**Model Configurations** (in `lampcode.js`):
+```javascript
+const MODEL_CONFIGS = {
+  'x-ai/grok-code-fast-1': { maxInputTokens: 8000, safetyMargin: 1000 },
+  'anthropic/claude-3.5-sonnet': { maxInputTokens: 180000, safetyMargin: 5000 },
+  'openai/gpt-4': { maxInputTokens: 120000, safetyMargin: 4000 },
+  'openai/gpt-3.5-turbo': { maxInputTokens: 15000, safetyMargin: 2000 }
+};
+```
+
+### Advanced Features
+
+**Directory Indexing & Caching:**
+- Pre-loads directory structures for fast file lookups
+- Maintains `projectFileIndex` and `projectBaseNameIndex` maps
+- Caches directory entries to avoid repeated filesystem scans
+
+**Tool History Tracking:**
+- Records every tool call with timestamp, duration, status
+- Accessible via `history` command
+- Includes detailed summaries and error messages
+
+**Change Logging:**
+- Tracks all file modifications during session
+- Useful for debugging and understanding AI actions
+
+**Context Snippets:**
+- Generates smart code snippets from project files
+- Caches snippets to reduce redundant processing
+- Limits snippet size to stay within token budgets
 
 ### Readline Interface
 

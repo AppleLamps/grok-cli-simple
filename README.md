@@ -31,7 +31,11 @@ npm install
 1. Copy the environment template:
 
    ```bash
+   # On macOS/Linux:
    cp .env.example .env
+   
+   # On Windows (PowerShell):
+   Copy-Item .env.example .env
    ```
 
 2. Get your OpenRouter API key from [openrouter.ai](https://openrouter.ai)
@@ -42,6 +46,8 @@ npm install
    OPENROUTER_API_KEY=your_api_key_here
    OPENROUTER_MODEL=x-ai/grok-code-fast-1
    ```
+
+**Windows Note:** Use PowerShell or Git Bash for best compatibility. Windows CMD may have limited functionality.
 
 ### 3. Make it globally available
 
@@ -81,7 +87,7 @@ lamp
 - `edit <filename>` - Edit a file with AI suggestions
 - `search <query>` - Search codebase for specific text
 - `open <filename>` - Open a file in your default editor
-- `history` - View recent tool usage history
+- `history` - View tool call history with timestamps and durations
 - `exit` or `quit` - Exit LampCode
 
 **Natural Language:** Just chat! The AI will automatically use tools when needed:
@@ -111,6 +117,27 @@ lamp> Create a todo list component with React hooks
 ```
 
 ## 🔧 Configuration
+
+### Environment Variables
+
+Configure LampCode by creating a `.env` file in your project root:
+
+```env
+# Required: Your OpenRouter API key
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+
+# Optional: AI model selection (default: x-ai/grok-code-fast-1)
+OPENROUTER_MODEL=x-ai/grok-code-fast-1
+
+# Optional: Custom API endpoint (default: https://openrouter.ai/api/v1)
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+
+# Optional: Request timeout in milliseconds (default: 30000)
+API_TIMEOUT=30000
+
+# Optional: Maximum retry attempts for failed requests (default: 3)
+MAX_RETRIES=3
+```
 
 ### Supported Models
 
@@ -145,6 +172,54 @@ LampCode automatically analyzes your project files to provide context-aware assi
 - Understands your project structure
 - Provides relevant suggestions based on your codebase
 - Keeps the context fresh when the AI requests a rescan or creates new files (with logging so you can review every tool call)
+
+### Autonomous Tools
+
+The AI can automatically invoke these tools to complete tasks:
+
+#### 1. `list_context`
+**View cached project files**
+- Shows currently loaded files with sizes and previews
+- No parameters needed
+- Example: "What files are currently loaded?"
+
+#### 2. `refresh_context`
+**Rescan workspace**
+- Parameters: `limit` (max files, default 20), `include_metadata`, `include_hidden`
+- Updates project context with fresh file data
+- Example: "Refresh the project context to see my new files"
+
+#### 3. `read_file`
+**Read file content**
+- Parameters: `file_path` (required), `start_line`, `end_line`, `max_lines`
+- Supports reading specific line ranges for large files
+- Example: "Read the authentication middleware"
+
+#### 4. `search_code`
+**Search across files**
+- Parameters: `query` (required), `file_pattern`, `max_results`
+- Returns matching lines with file paths and line numbers
+- Example: "Find all uses of the getUserData function"
+
+#### 5. `create_file`
+**Create new files**
+- Parameters: `file_path` (required), `content` (required), `overwrite`, `refresh_context`
+- Creates files within workspace boundaries
+- Example: "Create a new React component for the user profile"
+
+#### 6. `edit_file`
+**Modify existing files**
+- Parameters: `file_path` (required), `edits` (array of find/replace operations)
+- Supports multiple edits in a single operation
+- Example: "Update the API endpoint URL in the config file"
+
+#### 7. `list_directory`
+**Explore directory structure**
+- Parameters: `directory_path`, `recursive`, `max_depth`, `include_hidden`
+- Lists files and subdirectories
+- Example: "Show me what's in the components folder"
+
+**Security:** All file operations validate paths to prevent access outside the workspace. Symlinks and directory traversal attempts are blocked.
 
 ## 📝 Requirements
 

@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node bin/lamp.js",
     "dev": "node bin/lamp.js",
-    "build": "echo 'No build step required'"
+    "build": "echo 'No build step required'",
+    "test": "node scripts/test-tools-registry.js"
   },
   "keywords": [
     "cli",
