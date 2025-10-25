@@ -9,3 +9,6 @@ yarn-error.log*
 *.log
 dist/
 build/
+
+# LampCode session logs (excluded by default for privacy)
+.lampcode/
