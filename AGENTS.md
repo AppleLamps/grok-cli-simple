@@ -75,7 +75,6 @@ lampcode/
 │       ├── apiClient.js        # OpenRouter API communication
 │       ├── fileScanner.js      # Project file scanning with caching
 │       ├── ui.js               # Terminal UI with colors (chalk)
-│       ├── uiHelpers.js        # UI formatting utilities
 │       ├── prompt.js           # Readline prompt helpers
 │       ├── pathSecurity.js     # Path validation and security
 │       ├── tool-helpers.js     # Shared tool utility functions
